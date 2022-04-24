@@ -59,17 +59,7 @@ export default function App() {
               alignSelf: "center"
             }}
             onClick={() => {
-              let exportText = `{\n`;
-              for(let i=0; i<nrRows; i++) {
-                exportText+='\t{';
-                for(let j=0; j<nrCols; j++) {
-                  exportText+=`${tiles[i][j]},`;
-                }
-                exportText = exportText.slice(0, -1);
-                exportText+='},\n';
-              }
-              exportText = exportText.slice(0, -2);
-              exportText+='\n}';
+              let exportText = "{\n"+tiles.filter((row, index) => index < nrRows).map(x => "\t{"+x.filter((col, index) => index < nrCols).join(",")).join("},\n")+"}\n}"
               navigator.clipboard.writeText(exportText);
             }}
             >Export to clipboard</button>
