@@ -69,6 +69,9 @@ export default function App() {
         <TileGrid onMouseDown={() => {
           setIsActive(true);
         }}
+        onMouseLeave={() => {
+          setIsActive(false);
+        }}
         onMouseUp={() => {
           setIsActive(false);
         }} isActive={isActive} tileTypes={tileTypes} nrCols={nrCols} nrRows={nrRows} tiles={tiles} onChange={(row, col, val) => {
@@ -146,8 +149,8 @@ function TileTypeControl({index, tileType, onChange, tileTypes}) {
 }
 
 
-function TileGrid({nrCols, nrRows, tiles, onChange, tileTypes, isActive, onMouseDown, onMouseUp}) {
-  return <div onMouseDown={onMouseDown} onMouseUp={onMouseUp} style={{display: 'flex', flexDirection:"column"}}>
+function TileGrid({nrCols, nrRows, tiles, onChange, tileTypes, isActive, onMouseDown, onMouseUp, onMouseLeave}) {
+  return <div onMouseDown={onMouseDown} onMouseUp={onMouseUp} onMouseLeave={onMouseLeave} style={{display: 'flex', flexDirection:"column"}}>
     {tiles.map((rowVals, rowIndex) => {
       return rowIndex<nrRows ? <TileRow isActive={isActive} tiles={tiles} tileTypes={tileTypes} onChange={onChange} key={rowIndex} nrCols={nrCols} columns={rowVals} row={rowIndex} />: null;
     })}
