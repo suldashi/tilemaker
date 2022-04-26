@@ -3,6 +3,7 @@ import { useState } from 'react';
 export default function App() {
   const [nrCols, setNrCols] = useState(10);
   const [nrRows, setNrRows] = useState(10);
+  const [isActive, setIsActive] = useState(false);
   const [tileTypes, setTileTypes] = useState([{
     name: "Wall",
     color: "#000000",
@@ -65,7 +66,12 @@ export default function App() {
             >Export to clipboard</button>
       </div>
       <div>
-        <TileGrid tileTypes={tileTypes} nrCols={nrCols} nrRows={nrRows} tiles={tiles} onChange={(row, col, val) => {
+        <TileGrid onMouseDown={() => {
+          setIsActive(true);
+        }}
+        onMouseUp={() => {
+          setIsActive(false);
+        }} isActive={isActive} tileTypes={tileTypes} nrCols={nrCols} nrRows={nrRows} tiles={tiles} onChange={(row, col, val) => {
           setTiles(tiles.map((rows, rowIndex) => {
             return rowIndex !== row ? rows : rows.map((cols, colIndex) => {
               return colIndex !== col ? cols : val
@@ -140,15 +146,15 @@ function TileTypeControl({index, tileType, onChange, tileTypes}) {
 }
 
 
-function TileGrid({nrCols, nrRows, tiles, onChange, tileTypes}) {
-  return <div style={{display: 'flex', flexDirection:"column"}}>
+function TileGrid({nrCols, nrRows, tiles, onChange, tileTypes, isActive, onMouseDown, onMouseUp}) {
+  return <div onMouseDown={onMouseDown} onMouseUp={onMouseUp} style={{display: 'flex', flexDirection:"column"}}>
     {tiles.map((rowVals, rowIndex) => {
-      return rowIndex<nrRows ? <TileRow tiles={tiles} tileTypes={tileTypes} onChange={onChange} key={rowIndex} nrCols={nrCols} columns={rowVals} row={rowIndex} />: null;
+      return rowIndex<nrRows ? <TileRow isActive={isActive} tiles={tiles} tileTypes={tileTypes} onChange={onChange} key={rowIndex} nrCols={nrCols} columns={rowVals} row={rowIndex} />: null;
     })}
   </div>
 }
 
-function TileRow({columns, row, nrCols, onChange, tileTypes, tiles}) {
+function TileRow({columns, row, nrCols, onChange, tileTypes, tiles, isActive}) {
   return <div style={{
     display: 'flex',
     flexDirection: 'row',
@@ -156,14 +162,23 @@ function TileRow({columns, row, nrCols, onChange, tileTypes, tiles}) {
     justifyContent: 'center'
   }}>
     {columns.map((val, colIndex) => {
-      return colIndex <nrCols ? <Tile val={val} tiles={tiles} tileTypes={tileTypes} onChange={onChange} key={colIndex} row={row} col={colIndex} /> : null;
+      return colIndex <nrCols ? <Tile isActive={isActive} val={val} tiles={tiles} tileTypes={tileTypes} onChange={onChange} key={colIndex} row={row} col={colIndex} /> : null;
   })}
   </div>
 }
 
-function Tile({row, col, onChange, tileTypes, tiles, val}) {
+function Tile({row, col, onChange, tileTypes, tiles, val, isActive}) {
   return <div
-    onClick={() => {
+    draggable={false}
+    onMouseEnter={() => {
+      if(isActive) {
+        let activeColor = tileTypes.indexOf(tileTypes.find(x => x.active));
+        if(activeColor !== val) {
+          onChange(row, col, activeColor);
+        }
+      }
+    }}
+    onMouseDown={() => {
       let activeColor = tileTypes.indexOf(tileTypes.find(x => x.active));
       onChange(row, col, activeColor);
     }}
